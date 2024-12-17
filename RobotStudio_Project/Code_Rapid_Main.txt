@@ -1,0 +1,176 @@
+MODULE Module1
+    ! Módulo:  Module1
+    !
+    ! Descripción:
+    !   P3 lab session integration problem: sim to real
+    !
+    ! Autor: ajardon
+    ! Revisado por: Álvaro y Adrián :)
+    !
+    ! Versión: 2.0
+    !
+    !***********************************************************
+    !***********************************************************
+     ! points relative to Wobj_soporte_rueda
+    VAR socketdev serverSocket;
+    VAR socketdev clientSocket;
+    VAR string data;
+    VAR string calibration;
+    VAR string run;
+
+    VAR num pos1;                         ! Posición de la primera coma
+    VAR num pos2;                         ! Posición de la segunda coma
+    VAR bool okRadio;
+
+    VAR string EjeValorString;              ! Subcadena para la coordenada X
+    VAR string RadioValorString;              ! Subcadena para la coordenada Y  
+
+    VAR string eje;
+    VAR num radio;
+    VAR num currentAngle := 180;     ! Ángulo actual del robot
+    VAR num angleTool := -90;
+    VAR num angleSP:=0;
+    VAR num maxAngle := 360;       ! Ángulo máximo
+    VAR num minAngle := 180;
+    VAR num i:=1;
+    VAR num j:=1;
+    VAR num k:=1;
+    VAR num paso:=10;
+    VAR string client_ip := "192.168.125.1";!"127.0.0.1"; !"192.168.125.1";Set the IP of the WAN port of the real robot 192.168,0.91
+    !Process' variables
+    CONST robtarget ptoReposo:=[[558.569062375,391.204728564,297.631913338],[-0.000000013,-0.000000022,1,0.000000006],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    !CONST robtarget ptoPick:=[[190.152964329,689.995892332,56.318084196],[-0.00000001,0.000000013,1,-0.000000005],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    !CONST robtarget ptoAux:=[[204.950713217,341.660605837,100],[0.000000114,0.000000004,1,0.000000036],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    !VAR robtarget ptoCamara := ptoAux;
+    CONST robtarget P_center_rim:=[[0,0,0],[0.707106811,0,0,0.707106751],[0,0,-1,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Target_10:=[[100.000023296,0,-0.000035917],[0.707106811,0.000000011,0.00000001,0.707106751],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget pHome:=[[779.999968663,-32.139390864,470.733322375],[0.707085293,-0.005512517,0.707085293,-0.005512524],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget pCalibrationX:=[[800,0,496],[0.707106781,0,0.707106781,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    !CONST robtarget pCalibrationX:=[[800,0,496],[0,0.707106781,0,0.707106781],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget pCalibrationY:=[[800,0,496],[0.5,-0.5,0.5,-0.5],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    VAR robtarget pTest;
+    PROC main()
+        ConfJ\Off;
+        ConfL\Off;
+        !MoveJ pHome,v100,z50,Tdrill\WObj:=wobj0;
+        SocketCreate serverSocket; !Create a temp_socket 
+        SocketBind serverSocket, client_ip, 1025;
+        SocketListen serverSocket;
+        SocketAccept serverSocket,clientSocket,\Time:=WAIT_MAX;
+        currentAngle := 180;     ! Ángulo actual del robot
+        angleTool := -90;
+        calibration:="";
+        run:="";
+        data:="";
+        WHILE run <> "run" DO
+            SocketReceive clientSocket \Str:= run; 
+        ENDWHILE
+        SocketReceive clientSocket \Str:= data;
+        IF data <> "" THEN
+            ! Encontrar las posiciones de las comas
+            pos1 := StrFind(data, ChPos:=1, Set:=",");
+            pos2 := StrFind(data, ChPos:=pos1 + 1, Set:=",");
+            ! Extraer subcadenas
+            eje := StrPart(data, 1, pos1 - 1);
+            RadioValorString:= StrPart(data, pos1 + 1, pos2 - pos1 - 1);
+            ! Convertir cada subcadena en número
+            okRadio:=StrToVal(RadioValorString,radio);
+            TPWrite "Radius: "\Num:=radio;
+            TPWrite "Rotation: " + eje;
+        ENDIF
+        TPWrite "Going position of calibration...";
+        IF eje = "X" THEN
+            MoveJ pCalibrationX,v50,fine,Tdrill\WObj:=wobj0;
+            pTest:=pCalibrationX;
+            angleSP:=360;
+            k:=-1;
+        ELSEIF eje = "Y" THEN
+            MoveJ pCalibrationY,v50,fine,Tdrill\WObj:=wobj0;
+            pTest:=pCalibrationY;
+            angleSP:=angleTool;
+            k:=1;
+        !ELSEIF eje = "Z" THEN
+        !    MoveJ pCalibrationZ,v50,fine,Tdrill\WObj:=wobj0;    
+        ENDIF 
+        TPWrite "Calibrating...";
+        WaitTime 1;
+        SocketSend clientSocket \Str:="Calibrate";
+        WHILE calibration <> "calibrated" DO
+            SocketReceive clientSocket \Str:= calibration; 
+        ENDWHILE
+        TPWrite "IMU Calibrated";
+        !SocketReceive clientSocket \Str:= data;      
+        ! Iniciar movimiento dependiendo del eje y radio
+        i:=1;
+        j:=1;
+        WHILE currentAngle <= maxAngle DO
+            ! Realizar el movimiento en incrementos de 10 grados
+            MoveToTarget eje,radio,currentAngle,angleTool;
+            WaitTime 1; ! Pausa de 1 segundos
+            TPWrite "Set Point: "\Num:=angleSP;
+            SocketSend clientSocket \Str:=ValtoStr(angleSP);
+            angleTool:= angleTool + j*paso;
+            angleSP:= angleSP + k*paso;
+            WaitTime 1; ! Pausa de 1 segundos 
+            SocketReceive clientSocket \Str:= data;
+            TPWrite "Data: " + data;
+            currentAngle := currentAngle + i* paso; ! Incrementar el ángulo
+        ENDWHILE
+        i:=-1;
+        j:=-1;
+        k:=-k;
+        currentAngle := currentAngle + i* paso; ! Resto el ultimo paso
+        angleTool:= angleTool + j*paso;
+        angleSP:= angleSP + k*paso;
+!        ! Regreso al punto inicial (270 grados)
+        WHILE currentAngle >= minAngle DO
+            ! Realizar el movimiento en incrementos de 10 grados
+            MoveToTarget eje,radio,currentAngle,angleTool;
+            WaitTime 1; ! Pausa de 1 segundos
+            TPWrite "Set Point: "\Num:=angleSP;
+            SocketSend clientSocket \Str:=ValtoStr(angleSP);
+            angleTool:= angleTool + j*paso;
+            angleSP:= angleSP + k*paso;
+            WaitTime 1; ! Pausa de 1 segundos 
+            SocketReceive clientSocket \Str:= data; ! Enviar booleano al servidor  
+            TPWrite "Data: " + data;
+            currentAngle := currentAngle + i* paso; ! Incrementar el ángulo
+        ENDWHILE
+        ! Cerrar el socket
+        SocketSend clientSocket \Str:="finish";
+        SocketClose clientSocket;
+        SocketClose serverSocket;
+        
+        ! Error handler for power fail and connection lost
+        ERROR
+            IF ERRNO=ERR_SOCK_TIMEOUT THEN
+                RETRY;
+            ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
+                SocketSend clientSocket \Str:="finish";
+                SocketClose clientSocket;
+                SocketClose serverSocket;
+                SocketCreate serverSocket;
+                SocketBind serverSocket, client_ip, 1025;
+                SocketListen serverSocket;
+                SocketAccept serverSocket, clientSocket;
+                SocketSend clientSocket \Str:="GoFa Reconnected";
+                SocketReceive clientSocket \Str:= data;
+                data := "";
+                RETRY;
+            ELSE
+                !TPWrite "ERRNO = "\Num:=ERRNO;
+                Stop;
+            ENDIF
+    ENDPROC
+
+    PROC MoveToTarget(string eje, num radio, num angle, num setpoint)
+        MoveJ RelTool(Offs(pTest, 0, radio*Cos(angle), radio*Sin(angle)), 0, 0, 0 \Rz:=setpoint), v10, fine, Tdrill \WObj:=wobj0;
+    ENDPROC
+    PROC server_recover()
+
+    ENDPROC
+    PROC Path_10()
+        MoveL Target_10,v1000,z100,Tdrill\WObj:=Wobj_soporte_rueda;
+        !MoveL pCalibration,v1000,z100,Tdrill\WObj:=wobj0;
+    ENDPROC
+ENDMODULE
