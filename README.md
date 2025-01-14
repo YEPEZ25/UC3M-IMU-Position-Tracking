@@ -23,7 +23,7 @@ The project evaluates the angular measurement accuracy of the BNO055 IMU sensor.
    - Transmits data via Bluetooth to a Python program.  
    - Includes a schematic for connecting the BNO055 sensor to the Arduino Nano 33 BLE.
     
-   ![Arduino and IMU Schematic](schematic.png)  
+   ![Arduino and IMU Schematic](Images/schematic.png)  
    *Figure 1: Connection diagram between Arduino Nano 33 BLE and the BNO055 IMU sensor.*
 
 2. **Python Code**  
