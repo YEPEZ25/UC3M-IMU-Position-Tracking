@@ -2,16 +2,16 @@ MODULE Module1
     ! Módulo:  Module1
     !
     ! Descripción:
-    !   P3 lab session integration problem: sim to real
+    !   IMU-Position-Tracking
     !
-    ! Autor: ajardon
-    ! Revisado por: Álvaro y Adrián :)
+    ! Autor: Javier Yépez
+    ! Revisado por: Edwin Oña
     !
-    ! Versión: 2.0
+    ! Versión: 1.0
     !
     !***********************************************************
     !***********************************************************
-     ! points relative to Wobj_soporte_rueda
+  
     VAR socketdev serverSocket;
     VAR socketdev clientSocket;
     VAR string data;
@@ -39,9 +39,6 @@ MODULE Module1
     VAR string client_ip := "192.168.125.1";!"127.0.0.1"; !"192.168.125.1";Set the IP of the WAN port of the real robot 192.168,0.91
     !Process' variables
     CONST robtarget ptoReposo:=[[558.569062375,391.204728564,297.631913338],[-0.000000013,-0.000000022,1,0.000000006],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    !CONST robtarget ptoPick:=[[190.152964329,689.995892332,56.318084196],[-0.00000001,0.000000013,1,-0.000000005],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    !CONST robtarget ptoAux:=[[204.950713217,341.660605837,100],[0.000000114,0.000000004,1,0.000000036],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    !VAR robtarget ptoCamara := ptoAux;
     CONST robtarget P_center_rim:=[[0,0,0],[0.707106811,0,0,0.707106751],[0,0,-1,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
     CONST robtarget Target_10:=[[100.000023296,0,-0.000035917],[0.707106811,0.000000011,0.00000001,0.707106751],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
     CONST robtarget pHome:=[[779.999968663,-32.139390864,470.733322375],[0.707085293,-0.005512517,0.707085293,-0.005512524],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
@@ -122,7 +119,7 @@ MODULE Module1
         currentAngle := currentAngle + i* paso; ! Resto el ultimo paso
         angleTool:= angleTool + j*paso;
         angleSP:= angleSP + k*paso;
-!        ! Regreso al punto inicial (270 grados)
+        ! Regreso al punto inicial (270 grados)
         WHILE currentAngle >= minAngle DO
             ! Realizar el movimiento en incrementos de 10 grados
             MoveToTarget eje,radio,currentAngle,angleTool;
@@ -165,12 +162,5 @@ MODULE Module1
 
     PROC MoveToTarget(string eje, num radio, num angle, num setpoint)
         MoveJ RelTool(Offs(pTest, 0, radio*Cos(angle), radio*Sin(angle)), 0, 0, 0 \Rz:=setpoint), v10, fine, Tdrill \WObj:=wobj0;
-    ENDPROC
-    PROC server_recover()
-
-    ENDPROC
-    PROC Path_10()
-        MoveL Target_10,v1000,z100,Tdrill\WObj:=Wobj_soporte_rueda;
-        !MoveL pCalibration,v1000,z100,Tdrill\WObj:=wobj0;
     ENDPROC
 ENDMODULE
