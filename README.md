@@ -96,7 +96,8 @@ root/
 ├── RAPID/
 │ └── robot_motion.mod # RAPID code for robot control
 ├── README.md # Project documentation
-└── schematic.png # Schematic for sensor connections
+├── images/
+│ └── schematic.png # Schematic for sensor connections
 
 ---
 
