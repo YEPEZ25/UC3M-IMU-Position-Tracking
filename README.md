@@ -89,15 +89,18 @@ The project evaluates the angular measurement accuracy of the BNO055 IMU sensor.
 
 ## Files and Structure  
 root/
-├── Arduino/
-│ └── imu_bno055.ino # Arduino code for IMU data acquisition and Bluetooth transmission
-├── Python/
-│ └── main.py # Python script for communication and data logging
-├── RAPID/
-│ └── robot_motion.mod # RAPID code for robot control
-├── README.md # Project documentation
-├── images/
+├── Arduino_BNO055/
+│ └── Arduino_BNO055.ino # Arduino code for IMU data acquisition and Bluetooth 
+├── Python_Code/
+│ └── code_comunication.py # Python script for communication and data logging
+├── RobotStudio_Project/
+│ └── Code_Rapid_Main.txt # RAPID code for robot control
+│ └── IMU_test.rspag # RAPID project
+├── Results_cvs/
+│ └── data_X_X_X_X.csv # Logs IMU data in a `.csv` file for analysis.
+├── Images/
 │ └── schematic.png # Schematic for sensor connections
+├── README.md # Project documentation
 
 ---
 
