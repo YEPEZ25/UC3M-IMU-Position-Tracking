@@ -40,10 +40,12 @@ async def read_and_send_data(conn, client):
                     data = await client.read_gatt_char(UUID_JSON)
                     json_data = data.decode('utf-8')
                     parsed_data = json.loads(json_data)
-                    print(f"X: {parsed_data['X']}, Y: {parsed_data['Y']}, Z: {parsed_data['Z']}")
-
+                    print("Sensor1 data: ")
+                    print(f"X: {parsed_data['X1']}, Y: {parsed_data['Y1']}, Z: {parsed_data['Z1']}")
+                    print("Sensor2 data: ")
+                    print(f"X: {parsed_data['X2']}, Y: {parsed_data['Y2']}, Z: {parsed_data['Z2']}")
                     # Guardar datos en la lista
-                    data_log.append((parsed_data['X'], parsed_data['Y'], parsed_data['Z'], angle))
+                    data_log.append((angle, parsed_data['X1'], parsed_data['Y1'], parsed_data['Z1'], parsed_data['X2'], parsed_data['Y2'], parsed_data['Z2']))
 
                     # Enviar los datos al cliente del socket
                     response = json.dumps(parsed_data)
@@ -118,7 +120,7 @@ async def main():
         # Guardar datos en un archivo CSV al cerrar
         with open(f"data_{eje}_{radio}_{DATE}.csv", "w", newline="") as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';')
-            csvwriter.writerow(["X", "Y", "Z", f"SetPoint {eje}"])
+            csvwriter.writerow([f"SetPoint {eje}","X1", "Y1", "Z1","X2", "Y2", "Z2" ])
             csvwriter.writerows(data_log)
         print(f"Datos guardados en data_{eje}_{radio}_{DATE}.csv")
 
