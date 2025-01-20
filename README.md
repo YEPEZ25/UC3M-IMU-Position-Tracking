@@ -4,6 +4,7 @@ This work presents a test to evaluate the accuracy of the BNO055 IMU sensor inte
 This repository contains the code and resources for evaluating the accuracy of the BNO055 IMU sensor using an automated system involving an Arduino Nano 33 BLE, a Python program, and an ABB CRB 15000 robot controller.  
 
 ## Table of Contents  
+- [Project Branches](#branch)
 - [Overview](#overview)  
 - [System Components](#system-components)  
 - [Methodology](#methodology)  
@@ -11,6 +12,34 @@ This repository contains the code and resources for evaluating the accuracy of t
 - [Setup](#setup)  
 - [Usage](#usage)  
 - [Files and Structure](#files-and-structure)  
+
+---
+
+## Project Branches 
+The repository has two main branches:
+### 1. `OneIMU`.
+In this branch a single BNO055 IMU is connected via the I2C communication interface. The code in this branch is designed to read data from a single IMU and process it for position tracking.
+
+- **Features**:
+  - Single IMU BNO055.
+  - I2C communication.
+  - Reading data such as orientation, acceleration and yaw.
+
+### 2. `MultipleIMU`.
+In this branch two BNO055 IMUs are connected, also using the I2C interface. The code is prepared to handle data from two IMUs simultaneously, allowing for more advanced and accurate position tracking by having more sensor information.
+
+- **Features**:
+  - Two BNO055 IMUs.
+  - I2C communication.
+  - Handling data from both IMUs to calculate position.
+
+#### Configuring the I2C address of an IMU
+
+If you want to configure one of the BNO055 IMUs with I2C address `0x29`, you can follow the detailed instructions in the following link from Adafruit:
+
+- [IMU configuration with address 0x29](https://learn.adafruit.com/adafruit-bno055-bmp280-bff/pinouts).
+
+This link will guide you through the process to change the I2C address of the IMU if you need to have two IMUs connected on the same I2C bus.
 
 ---
 
@@ -91,6 +120,8 @@ The project evaluates the angular measurement accuracy of the BNO055 IMU sensor.
 root/
 ├── Arduino_BNO055/
 │ └── Arduino_BNO055.ino # Arduino code for IMU data acquisition and Bluetooth 
+├── Arduino_Multiple_BNO055/
+│ └── Arduino_Multiple_BNO055.ino # Arduino code for IMU data acquisition and Bluetooth 
 ├── Python_Code/
 │ └── code_comunication.py # Python script for communication and data logging
 ├── RobotStudio_Project/
