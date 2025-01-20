@@ -4,7 +4,7 @@ This work presents a test to evaluate the accuracy of the BNO055 IMU sensor inte
 This repository contains the code and resources for evaluating the accuracy of the BNO055 IMU sensor using an automated system involving an Arduino Nano 33 BLE, a Python program, and an ABB CRB 15000 robot controller.  
 
 ## Table of Contents  
-- [Project Branches](#branch)
+- [Project Branches](#project-branches)
 - [Overview](#overview)  
 - [System Components](#system-components)  
 - [Methodology](#methodology)  
